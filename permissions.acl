@@ -1,0 +1,115 @@
+rule SystemACL {
+  description: "SystemACL rule to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule ReadCommodity {
+  description: "All participants can read their own goods"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.commodity"
+  condition: (p.getIdentifier() == r.owner.getIdentifier())
+  action: ALLOW 
+}
+
+rule VendorReadPO {
+  description: "All vendors can read their own POs"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.PO"
+  condition: (p.getIdentifier() == r.vendor.getIdentifier())
+  action: ALLOW 
+}
+
+rule OrdererReadPO {
+  description: "All orderers can read their own POs"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.PO"
+  condition: (p.getIdentifier() == r.orderer.getIdentifier())
+  action: ALLOW 
+}
+
+rule CreateTransferCommodity {
+  description: "All participants can access TransferCommodity transaction"
+  participant: "org.supplychain.network.*"
+  operation: CREATE  
+  resource: "org.supplychain.network.TransferCommodity"
+  action: ALLOW 
+}
+
+rule OnlyTransferByTransferCommodity {
+  description: "Allow all participants to transfer its own commodity only by TransferCommodity"
+  participant(p): "org.supplychain.network.*"
+  operation: UPDATE 
+  resource(r): "org.supplychain.network.*"
+  transaction(tx): "org.supplychain.network.TransferCommodity"
+  condition: (p.getIdentifier() == r.owner.getIdentifier())
+  action: ALLOW 
+}
+
+rule ReadOwnTransactionRecordsIssuer {
+  description: "Grant all participants to read their only their own transaction records"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.TransferCommodity"
+  condition: (p.getIdentifier() == r.issuer.getIdentifier())
+  action: ALLOW 
+}
+
+rule ReadOwnTransactionRecordsNewOwner {
+  description: "Grant new owner to read their only their own transaction records"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.TransferCommodity"
+  condition: (p.getIdentifier() == r.newOwner.getIdentifier())
+  action: ALLOW 
+}
+
+rule ReadOwnTransactionRecordsVendor {
+  description: "Grant all participants to read their only their own transaction records"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.InitiatePO"
+  condition: (p.getIdentifier() == r.vendor.getIdentifier())
+  action: ALLOW 
+}
+
+rule ReadOwnTransactionRecordsOrderer {
+  description: "Grant all participants to read their only their own transaction records"
+  participant(p): "org.supplychain.network.*"
+  operation: READ 
+  resource(r): "org.supplychain.network.InitiatePO"
+  condition: (p.getIdentifier() == r.orderer.getIdentifier())
+  action: ALLOW 
+}
+
+rule CreateOwnCommodity {
+  description: "Grant all participants to create it's own resource"
+  participant(p): "org.supplychain.network.*"
+  operation: CREATE 
+  resource(r): "org.supplychain.network.commodity"
+  condition: (p.getIdentifier() == r.owner.getIdentifier())
+  action: ALLOW 
+}
+
+rule CreateOwnPO {
+  description: "Grant all participants to create new POs"
+  participant(p): "org.supplychain.network.*"
+  operation: CREATE 
+  resource(r): "org.supplychain.network.PO"
+  condition: (p.getIdentifier() == r.orderer.getIdentifier())
+  action: ALLOW 
+}
+
+rule CreateInitiatePO {
+  description: "All participants can access InitiatePO transaction"
+  participant(p): "org.supplychain.network.*"
+  operation: CREATE  
+  resource(r): "org.supplychain.network.InitiatePO"
+  condition: (p.getIdentifier() == r.orderer.getIdentifier())
+  action: ALLOW 
+}
